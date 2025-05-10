@@ -5,8 +5,6 @@
   <title>PadTrainer – Game</title>
 
   <link rel="stylesheet" href="css/style.css">
-
-  <!-- 共通設定 → コア -->
   <script src="./js/settings.js"      defer></script>
   <script src="./js/core/gameCore.js" defer></script>
 </head>
@@ -18,7 +16,7 @@
   </div>
 
   <div id="score">Score: 0</div>
-  <div id="time">--:--</div>  <!-- 初期値はコアで設定 -->
+  <div id="time">--:--</div>
   <div id="start-message">Any Button Press</div>
   <div id="countdown"></div>
 
@@ -41,7 +39,8 @@
     const mode = new URLSearchParams(location.search).get('mode') || 'shoot';
     const file = map[mode] ?? 'shootingTarget';
     const s    = document.createElement('script');
-    s.defer = true; s.src = `js/games/${file}.js`; document.body.appendChild(s);
+    s.defer = true; s.src = `js/games/${file}.js`;
+    document.body.appendChild(s);
   </script>
 </body>
 </html>
