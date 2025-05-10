@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>PadTrainer – Game</title>
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- 共通設定 → コア -->
+  <script src="./js/settings.js"      defer></script>
+  <script src="./js/core/gameCore.js" defer></script>
+</head>
+
+<body>
+  <div class="frame">
+    <canvas id="path-canvas" class="hidden"></canvas>
+    <div id="circle" class="circle hidden"></div>
+  </div>
+
+  <div id="score">Score: 0</div>
+  <div id="time">--:--</div>  <!-- 初期値はコアで設定 -->
+  <div id="start-message">Any Button Press</div>
+  <div id="countdown"></div>
+
+  <div id="game-over-message" class="hidden">
+    <div>Time Up!</div>
+    <div class="score-line">Your Score:
+      <span id="final-score" class="gaming-color bold-score"></span>
+    </div>
+    <div class="buttons">
+      <div id="btn-retry" class="button selected">Retry</div>
+      <div id="btn-home"  class="button">Home</div>
+    </div>
+  </div>
+
+  <script>
+    const map = {
+      shoot:'shootingTarget', move:'shootingMoveTarget',
+      track:'trackingTarget', trace:'lineTrace', practice:'practiceMode'
+    };
+    const mode = new URLSearchParams(location.search).get('mode') || 'shoot';
+    const file = map[mode] ?? 'shootingTarget';
+    const s    = document.createElement('script');
+    s.defer = true; s.src = `js/games/${file}.js`; document.body.appendChild(s);
+  </script>
+</body>
+</html>
