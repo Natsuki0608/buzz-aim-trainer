@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <title>buzz aim trainer</title>
 
+  <!-- フォント読込 -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css">
   <script src="./js/settings.js"      defer></script>
   <script src="./js/core/gameCore.js" defer></script>
@@ -32,15 +35,11 @@
   </div>
 
   <script>
-    const map = {
-      shoot:'shootingTarget', move:'shootingMoveTarget',
-      track:'trackingTarget', trace:'lineTrace', practice:'practiceMode'
-    };
-    const mode = new URLSearchParams(location.search).get('mode') || 'shoot';
-    const file = map[mode] ?? 'shootingTarget';
-    const s    = document.createElement('script');
-    s.defer = true; s.src = `js/games/${file}.js`;
-    document.body.appendChild(s);
+    const map={shoot:'shootingTarget',move:'shootingMoveTarget',track:'trackingTarget',trace:'lineTrace',practice:'practiceMode'};
+    const mode=new URLSearchParams(location.search).get('mode')||'shoot';
+    const scr=document.createElement('script');
+    scr.defer=true; scr.src=`js/games/${map[mode]??'shootingTarget'}.js`;
+    document.body.appendChild(scr);
   </script>
 </body>
 </html>

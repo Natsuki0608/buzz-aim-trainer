@@ -1,68 +1,162 @@
-/* =====================================================================
-   PadTrainer – Global Stylesheet
-   ── 改訂: cursor-dot / aux-canvas / hitbox 赤 など追加
-====================================================================== */
+/* Google Fonts ---------------------------------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
-/* -------- 基本レイアウト ------------------------------------------------ */
-html,body{height:100%;margin:0;font-size:2vh;}
-body{display:flex;justify-content:center;align-items:center;background:#000;overflow:hidden;position:relative;}
-.frame{width:80vw;height:80vh;border:0.5vh solid #fff;position:relative;box-sizing:border-box;}
+/* すべてのテキストをレトロフォントで統一 ------------------------------*/
+html, body, button, a, div, span, canvas{
+    font-family: 'VT323', monospace;
+}
 
-/* -------- カーソル ---------------------------------------------------- */
+/* ----------------------------------------------------------------------
+   既存スタイル
+----------------------------------------------------------------------*/
+html,
+body{
+    height:100%;
+    margin:0;
+    font-size:3vh;               /* ← 2vh から 3vh に拡大 (1.5 倍) */
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#000;
+    overflow:hidden;
+    position:relative;
+}
+
+.frame{
+    width:80vw;
+    height:80vh;
+    border:0.5vh solid #fff;
+    position:relative;
+    box-sizing:border-box;
+}
+
 .circle{
-  position:absolute;
-  width:50px;height:50px;               /* JS で動的変更可 */
-  border-radius:50%;background:#fff;z-index:10;
+    border-radius:50%;
+    position:absolute;
+    background:white;
+    z-index:10;
 }
-/* カーソル中心点 */
-.cursor-dot{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:6px;height:6px;border-radius:50%;background:red;
-}
+
 .circle.hit::after{
-  content:'';position:absolute;inset:-0.4vh;border-radius:50%;
-  background:conic-gradient(deeppink,mediumvioletred,purple,indigo,dodgerblue,cyan,deeppink);
-  pointer-events:none;z-index:-1;
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
-          mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
+    content:'';
+    position:absolute;
+    top:-0.4vh;
+    left:-0.4vh;
+    width:calc(100% + 0.8vh);
+    height:calc(100% + 0.8vh);
+    border-radius:50%;
+    background:conic-gradient(deeppink,mediumvioletred,purple,indigo,dodgerblue,cyan,deeppink);
+    pointer-events:none;
+    z-index:-1;
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
+            mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
 }
 
-/* -------- 的 ---------------------------------------------------------- */
 .target{
-  position:absolute;width:50px;height:50px;border-radius:50%;
-  background-image:conic-gradient(deeppink,mediumvioletred,purple,indigo,dodgerblue,cyan,deeppink);
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
-          mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
-  z-index:15;
+    position:absolute;
+    border-radius:50%;
+    background:transparent;
+    background-image:conic-gradient(deeppink,mediumvioletred,purple,indigo,dodgerblue,cyan,deeppink);
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
+            mask:radial-gradient(farthest-side,transparent calc(100% - 0.4vh),black calc(100% - 0.4vh));
+    z-index:20;
 }
 
-/* -------- 可視ヒットボックス ----------------------------------------- */
-.hitbox{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  border-radius:50%;background:rgba(255,0,0,0.3);pointer-events:none;z-index:14;
+/* ---------------- HUD ----------------*/
+#score,
+#time{
+    position:absolute;
+    color:white;
+    font-size:1.6rem;
+    user-select:none;
 }
 
-/* -------- 補助線用 Canvas (背面) ------------------------------------- */
-#aux-lines{
-  position:absolute;top:0;left:0;width:100%;height:100%;
-  pointer-events:none;z-index:5;                /* 的(15)、カーソル(10)より後ろ */
+#score{bottom:5vh; left:50%; transform:translateX(-50%);}
+#time {top:5vh;    left:50%; transform:translateX(-50%);}
+
+#start-message{
+    position:absolute;
+    color:white;
+    font-size:2rem;
+    text-align:center;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    animation:blink 2s infinite;
 }
 
-/* -------- HUD / メッセージ (既存) ------------------------------------ */
-#score,#time{position:absolute;color:#fff;font-size:1.6rem;font-family:sans-serif;user-select:none;}
-#score{bottom:5vh;left:50%;transform:translateX(-50%);}
-#time{top:5vh;left:50%;transform:translateX(-50%);}
-#start-message{position:absolute;color:#fff;font-size:2rem;font-family:sans-serif;text-align:center;top:50%;left:50%;transform:translate(-50%,-50%);animation:blink 2s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
-#countdown{position:absolute;color:#fff;font-size:3rem;font-weight:bold;font-family:sans-serif;text-align:center;top:50%;left:50%;transform:translate(-50%,-50%);}
-#game-over-message{position:absolute;color:#fff;font-size:2rem;font-family:sans-serif;text-align:center;top:50%;left:50%;transform:translate(-50%,-50%);}
-.score-line{margin-top:1vh;} .bold-score{font-weight:bold;font-size:4rem;}
-.gaming-color{background:conic-gradient(deeppink,mediumvioletred,purple,indigo,dodgerblue,cyan,deeppink);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;}
-.buttons{display:flex;justify-content:center;gap:4vw;margin-top:2vh;}
-.button{padding:1vh 2vh;border:0.3vh solid #fff;border-radius:1vh;font-size:1.5rem;cursor:pointer;color:#fff;font-family:sans-serif;text-align:center;text-decoration:none;min-width:200px;}
-.button.selected{background:#fff;color:#000;}
 
-/* -------- ホームメニュー / 汎用 ------------------------------------ */
-.menu-container{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:2vh;align-items:center;}
-.blink-message{position:absolute;color:#fff;font-size:2rem;font-family:sans-serif;text-align:center;top:50%;left:50%;transform:translate(-50%,-50%);animation:blink 2s infinite;}
+#countdown{
+    position:absolute;
+    color:white;
+    font-size:3rem;
+    font-weight:bold;
+    text-align:center;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+}
+
+#game-over-message{
+    position:absolute;
+    color:white;
+    font-size:2rem;
+    text-align:center;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+}
+
+.score-line{margin-top:1vh;}
+.bold-score{font-weight:bold; font-size:4rem;}
+
+.gaming-color{
+    background:conic-gradient(deeppink,mediumvioletred,purple,indigo,dodgerblue,cyan,deeppink);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    display:inline-block;
+}
+
+.buttons{
+    display:flex;
+    justify-content:center;
+    gap:4vw;
+    margin-top:2vh;
+}
+
+.button{
+    padding:1vh 2vh;
+    border:0.3vh solid white;
+    border-radius:1vh;
+    font-size:1.5rem;
+    cursor:pointer;
+    color:white;
+    text-align:center;
+    text-decoration:none;
+    min-width:200px;
+}
+
+.button.selected{background-color:white; color:black;}
+
+.menu-container{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    display:flex;
+    flex-direction:column;
+    gap:2vh;
+    align-items:center;
+}
+
+.blink-message{
+    position:absolute;
+    color:white;
+    font-size:2rem;
+    text-align:center;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    animation:blink 2s infinite;
+}
+
 .hidden{display:none;}
