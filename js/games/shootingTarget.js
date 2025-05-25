@@ -1,54 +1,48 @@
 /* ======================================================================
    Shoot Target
-   - 静止的を撃つ
-   - SETTINGS の各オプション対応
-     • numTarget        : 画面に出す的の数
-     • supportLine      : 補助線 ON/OFF
-     • vibration        : 振動 ON/OFF
-     • visualizeHitBox  : ヒットボックス可視 ON/OFF
+   - 静止ターゲットを撃つ
+   - buttonLayout で R1L1 ⇔ R2L2 切替
 ====================================================================== */
 GameCore.init({
 
   /* ---------------------------- 開始 ---------------------------- */
   start() {
-    /* 共通設定 */
     this.sensNormal = SETTINGS.sensNormal;
     this.sensAim    = SETTINGS.sensAim;
     this.hitScale   = SETTINGS.hitBoxSize;
-    this.maxTargets = SETTINGS.numTarget;        // ★ 的の数
+    this.maxTargets = SETTINGS.numTarget;
 
-    /* DOM 準備 */
+    /* DOM -------------------------------------------------------- */
     this.circle = document.getElementById('circle');
     this.frame  = document.querySelector('.frame');
     this.circle.classList.remove('hidden');
 
-    /* カーソルサイズ */
     this.circleSize = SETTINGS.cursorSize;
     this.circle.style.width =
     this.circle.style.height = `${this.circleSize}px`;
 
-    /* 中心ドット */
     if (SETTINGS.visualizeHitBox && !this.circle.querySelector('.cursor-dot')) {
-      const d = document.createElement('div'); d.className = 'cursor-dot';
+      const d = document.createElement('div');
+      d.className = 'cursor-dot';
       this.circle.appendChild(d);
     }
 
-    /* サイズ派生 */
     this.targetSize  = this.circleSize;
     this.hitDiameter = this.targetSize * this.hitScale;
     this.hitRadius   = this.hitDiameter / 2;
 
-    /* カーソル初期位置 */
     this.cx = this.frame.clientWidth  / 2 - this.circleSize / 2;
     this.cy = this.frame.clientHeight / 2 - this.circleSize / 2;
     this.circle.style.left = `${this.cx}px`;
     this.circle.style.top  = `${this.cy}px`;
 
-    /* 補助線 Canvas */
+    /* 補助線 Canvas ---------------------------------------------- */
     if (SETTINGS.supportLine) {
       this.aux = document.getElementById('aux-lines') || (() => {
-        const c = document.createElement('canvas'); c.id = 'aux-lines';
-        this.frame.appendChild(c); return c;
+        const c = document.createElement('canvas');
+        c.id = 'aux-lines';
+        this.frame.appendChild(c);
+        return c;
       })();
       this.aux.width  = this.frame.clientWidth;
       this.aux.height = this.frame.clientHeight;
@@ -57,7 +51,7 @@ GameCore.init({
       this.ctx = null;
     }
 
-    /* ターゲット生成 */
+    /* ターゲット生成 -------------------------------------------- */
     this.targets = [];
     while (this.targets.length < this.maxTargets) addTarget.call(this);
 
@@ -66,12 +60,16 @@ GameCore.init({
     this.prevShot = false;
   },
 
-  /* ---------------------------- 毎フレーム ---------------------------- */
+  /* ---------------------------- 毎フレーム ------------------------ */
   update() {
     const gp = navigator.getGamepads()[0]; if (!gp) return;
 
-    /* カーソル移動 */
-    const sens = gp.buttons[4]?.pressed ? this.sensAim : this.sensNormal;
+    /* レイアウト依存ボタン -------------------------------------- */
+    const aimIdx   = (SETTINGS.buttonLayout === 'R2L2') ? 6 : 4; // L2 or L1
+    const shootIdx = (SETTINGS.buttonLayout === 'R2L2') ? 7 : 5; // R2 or R1
+
+    /* カーソル移動 ---------------------------------------------- */
+    const sens = gp.buttons[aimIdx]?.pressed ? this.sensAim : this.sensNormal;
     this.cx += gp.axes[2] * sens;
     this.cy += gp.axes[3] * sens;
     this.cx = Math.max(0, Math.min(this.cx, this.frame.clientWidth  - this.circleSize));
@@ -79,23 +77,24 @@ GameCore.init({
     this.circle.style.left = `${this.cx}px`;
     this.circle.style.top  = `${this.cy}px`;
 
-    /* ヒット演出 */
+    /* ヒット演出 -------------------------------------------------- */
     const hitAny = this.targets.some(t => hitCheck.call(this, t));
     this.circle.classList.toggle('hit', hitAny);
 
-    /* 発砲処理 */
-    if (gp.buttons[5]?.pressed && !this.prevShot) {
+    /* 発砲処理 ---------------------------------------------------- */
+    if (gp.buttons[shootIdx]?.pressed && !this.prevShot) {
       for (let i = 0; i < this.targets.length; i++) {
         if (hitCheck.call(this, this.targets[i])) {
 
           if (SETTINGS.vibration && gp.vibrationActuator) {
             gp.vibrationActuator.playEffect('dual-rumble', {
-              duration: 100, strongMagnitude: 1.0, weakMagnitude: 1.0
+              duration: 100,
+              strongMagnitude: 1.0,
+              weakMagnitude:   1.0
             });
           }
 
           removeTarget.call(this, i);
-          /* 常に maxTargets 個になるまで補充 */
           while (this.targets.length < this.maxTargets) addTarget.call(this);
           drawLines.call(this);
           addScore(1);
@@ -103,13 +102,13 @@ GameCore.init({
         }
       }
     }
-    this.prevShot = gp.buttons[5]?.pressed;
+    this.prevShot = gp.buttons[shootIdx]?.pressed;
   },
 
   /* ---------------------------- 終了 ---------------------------- */
   cleanup() {
-    this.targets.forEach(t => { t.el.remove(); if(t.hb) t.hb.remove(); });
-    if (this.ctx) this.ctx.clearRect(0,0,this.aux.width,this.aux.height);
+    this.targets.forEach(t => { t.el.remove(); if (t.hb) t.hb.remove(); });
+    if (this.ctx) this.ctx.clearRect(0, 0, this.aux.width, this.aux.height);
     this.circle.classList.add('hidden');
   }
 });
@@ -117,6 +116,8 @@ GameCore.init({
 /* ======================================================================
    Utility
 ====================================================================== */
+
+/* ターゲット追加 ------------------------------------------------------- */
 function addTarget() {
   const x = Math.random() * (this.frame.clientWidth  - this.targetSize);
   const y = Math.random() * (this.frame.clientHeight - this.targetSize);
@@ -131,11 +132,11 @@ function addTarget() {
   let hb = null;
   if (SETTINGS.visualizeHitBox) {
     hb = document.createElement('div');
-    hb.className      = 'hitbox';
-    hb.style.width    =
-    hb.style.height   = `${this.hitDiameter}px`;
-    hb.style.left     = `${x + this.targetSize / 2}px`;
-    hb.style.top      = `${y + this.targetSize / 2}px`;
+    hb.className     = 'hitbox';
+    hb.style.width   =
+    hb.style.height  = `${this.hitDiameter}px`;
+    hb.style.left    = `${x + this.targetSize / 2}px`;
+    hb.style.top     = `${y + this.targetSize / 2}px`;
     this.frame.appendChild(hb);
   }
 
@@ -143,15 +144,43 @@ function addTarget() {
   this.targets.push({ el, hb, x, y });
 }
 
-function removeTarget(i) { const t=this.targets[i]; t.el.remove(); if(t.hb) t.hb.remove(); this.targets.splice(i,1); }
-function hitCheck(t){ const cx=this.cx+this.circleSize/2, cy=this.cy+this.circleSize/2, tx=t.x+this.targetSize/2, ty=t.y+this.targetSize/2; return Math.hypot(cx-tx,cy-ty)<=this.hitRadius;}
-function addScore(v){ const s=document.getElementById('score'); s.textContent='Score: '+(parseInt(s.textContent.split(': ')[1])+v);}
-function drawLines(){
-  if(!this.ctx||!SETTINGS.supportLine) return;
-  this.ctx.clearRect(0,0,this.aux.width,this.aux.height);
-  const ax=this.cx+this.circleSize/2, ay=this.cy+this.circleSize/2;
-  this.ctx.strokeStyle='rgba(255,255,255,0.2)'; this.ctx.lineWidth=1;
+/* ターゲット削除 ------------------------------------------------------- */
+function removeTarget(i) {
+  const t = this.targets[i];
+  t.el.remove();
+  if (t.hb) t.hb.remove();
+  this.targets.splice(i, 1);
+}
+
+/* ヒット判定 ----------------------------------------------------------- */
+function hitCheck(t) {
+  const cx = this.cx + this.circleSize / 2;
+  const cy = this.cy + this.circleSize / 2;
+  const tx = t.x  + this.targetSize  / 2;
+  const ty = t.y  + this.targetSize  / 2;
+  return Math.hypot(cx - tx, cy - ty) <= this.hitRadius;
+}
+
+/* スコア加算 ----------------------------------------------------------- */
+function addScore(v) {
+  const s = document.getElementById('score');
+  s.textContent = 'Score: ' + (parseInt(s.textContent.split(': ')[1]) + v);
+}
+
+/* 補助線描画 ----------------------------------------------------------- */
+function drawLines() {
+  if (!this.ctx || !SETTINGS.supportLine) return;
+  this.ctx.clearRect(0, 0, this.aux.width, this.aux.height);
+  const ax = this.cx + this.circleSize / 2;
+  const ay = this.cy + this.circleSize / 2;
+  this.ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  this.ctx.lineWidth   = 1;
   this.ctx.beginPath();
-  this.targets.forEach(t=>{const tx=t.x+this.targetSize/2, ty=t.y+this.targetSize/2; this.ctx.moveTo(ax,ay); this.ctx.lineTo(tx,ty);});
+  this.targets.forEach(t => {
+    const tx = t.x + this.targetSize / 2;
+    const ty = t.y + this.targetSize / 2;
+    this.ctx.moveTo(ax, ay);
+    this.ctx.lineTo(tx, ty);
+  });
   this.ctx.stroke();
 }

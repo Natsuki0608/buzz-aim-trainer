@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings - buzz aim trainer</title>
+
+  <!-- フォント -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- 設定画面用スタイル ------------------------------------------------- -->
+  <style>
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      justify-content:center;min-height:100vh;margin:0;color:white;
+    }
+    /* ラベル列＋入力列の 2 カラム ----------------------------------- */
+    .form-row{
+      display:grid;
+      grid-template-columns: 240px auto;
+      align-items:center;
+      column-gap:2vw;
+      margin:0.8vh 0;
+    }
+    label{justify-self:end;}
+    input[type=number], select{width:100%;}
+    /* curve ratio 入力ペア */
+    .range-pair{
+      display:flex;align-items:center;gap:0.6rem;
+    }
+    .range-pair input[type=number]{width:80px;}
+    /* 見出し */
+    h2,h3{margin:3vh 0 1vh;color:white;}
+    /* ボタン並び */
+    .btn-area{display:flex;gap:2vw;margin-top:3vh;flex-wrap:wrap;justify-content:center;}
+    .button{min-width:120px;}           /* 各ボタン幅を統一 */
+    /* 隠しファイル入力 (Import 用) */
+    #file-input{display:none;}
+  </style>
+
+  <script src="./js/settings.js"       defer></script>
+  <script src="./js/settingsEditor.js" defer></script>
+</head>
+
+<body>
+  <h1>Settings</h1>
+
+  <!-- JS がフォームと見出しを挿入 -->
+  <div id="form-container"></div>
+
+  <!-- ボタン -->
+  <div class="btn-area">
+    <button id="btn-save"    class="button">Save</button>
+    <button id="btn-import"  class="button">Import</button>
+    <button id="btn-export"  class="button">Export</button>
+    <button id="btn-default" class="button">Default</button>
+    <a     href="index.html" class="button">Home</a>
+  </div>
+
+  <!-- Import 用ファイル選択 (hidden) -->
+  <input type="file" id="file-input" accept=".json">
+</body>
+</html>
