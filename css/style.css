@@ -66,26 +66,20 @@ body{
 }
 
 /* === ★ visualizeHitBox 用追加スタイル ================================ */
-/* カーソル中心の赤点: px -> vh に変更してレスポンシブ化 --------------- */
 .cursor-dot{
     position:absolute;
     left:50%; top:50%;
-    width:1vh; height:1vh;           /* ハードコード回避：ビューポート高さ基準 */
+    width:1vh; height:1vh;           /* ビューポート高さ基準でレスポンシブ */
     background:red;
     border-radius:50%;
     transform:translate(-50%,-50%);
     pointer-events:none;
-    z-index:30;                      /* カーソル本体より前面 */
+    z-index:30;
 }
 
-/* ターゲット／ゴーストのヒットボックス --------------------------------
-   - 枠線を除去し「赤のべた塗り」
-   - 透過 30 % (0.3)
-   - transform で中心座標基準
-------------------------------------------------------------------------*/
 .hitbox{
     position:absolute;
-    background:rgba(255,0,0,0.3);    /* 30 % 透過の赤べた塗り */
+    background:rgba(255,0,0,0.3);    /* 30% 透過の赤べた塗り */
     border-radius:50%;
     transform:translate(-50%,-50%);
     pointer-events:none;
@@ -152,6 +146,7 @@ body{
     margin-top:2vh;
 }
 
+/* === ★ ボタン共通デザイン (anchor / button 両対応) ================ */
 .button{
     padding:1vh 2vh;
     border:0.3vh solid white;
@@ -160,11 +155,16 @@ body{
     cursor:pointer;
     color:white;
     text-align:center;
-    text-decoration:none;
+    text-decoration:none;  /* anchor の下線を除去 */
     min-width:200px;
+    background:none;       /* ★ ボタン要素のデフォルト背景色を打ち消す */
+    appearance:none;       /* iOS / Safari 用 */
 }
 
-.button.selected{background-color:white; color:black;}
+.button.selected{
+    background-color:white;
+    color:black;
+}
 
 .menu-container{
     position:absolute;
