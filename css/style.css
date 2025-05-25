@@ -65,6 +65,33 @@ body{
     z-index:20;
 }
 
+/* === ★ visualizeHitBox 用追加スタイル ================================ */
+/* カーソル中心の赤点: px -> vh に変更してレスポンシブ化 --------------- */
+.cursor-dot{
+    position:absolute;
+    left:50%; top:50%;
+    width:1vh; height:1vh;           /* ハードコード回避：ビューポート高さ基準 */
+    background:red;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    z-index:30;                      /* カーソル本体より前面 */
+}
+
+/* ターゲット／ゴーストのヒットボックス --------------------------------
+   - 枠線を除去し「赤のべた塗り」
+   - 透過 30 % (0.3)
+   - transform で中心座標基準
+------------------------------------------------------------------------*/
+.hitbox{
+    position:absolute;
+    background:rgba(255,0,0,0.3);    /* 30 % 透過の赤べた塗り */
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    z-index:15;
+}
+
 /* ---------------- HUD ----------------*/
 #score,
 #time{

@@ -8,27 +8,32 @@
 
 /* -------------------- デフォルト値を保持 ---------------------------- */
 const DEFAULT_SETTINGS = {
-  sensNormal:20,sensAim:10,playTime:60,hitBoxSize:0.6,cursorSize:50,
-  numTarget:5,birthRate:6,minCurveRatio:0.05,maxCurveRatio:0.30,
-  vibration:true,supportLine:false,visualizeHitBox:false,buttonLayout:'R1L1'
+  sensNormal:20, sensAim:10, playTime:60, hitBoxSize:0.6, cursorSize:50,
+  numTarget:5, birthRate:6, minCurveRatio:0.05, maxCurveRatio:0.30,
+  vibration:true, supportLine:false, lineWidth:1, visualizeHitBox:false,
+  buttonLayout:'R1L1'
 };
 
 window.addEventListener('DOMContentLoaded', () => {
 
   /* ---- ラベルとカテゴリ構造 --------------------------------------- */
   const LABELS = {
-    sensNormal:'sensitive(normal)',sensAim:'sensitive(aim)',
-    playTime:'game time',hitBoxSize:'hit box size',cursorSize:'cursor size',
-    vibration:'vibration',visualizeHitBox:'visualize hit box',
-    buttonLayout:'button layout',numTarget:'target quantity',
-    supportLine:'support line',birthRate:'birth rate'
+    sensNormal:'sensitive(normal)', sensAim:'sensitive(aim)',
+    playTime:'game time', hitBoxSize:'hit box size', cursorSize:'cursor size',
+    vibration:'vibration', visualizeHitBox:'visualize hit box',
+    buttonLayout:'button layout', numTarget:'target quantity',
+    supportLine:'support line', lineWidth:'support line width',
+    birthRate:'birth rate'
   };
 
   const CATEGORIES = [
-    { title:'General', keys:['sensNormal','sensAim','playTime','hitBoxSize',
-                              'cursorSize','vibration','visualizeHitBox','buttonLayout'] },
-    { title:'Shoot Target', keys:['numTarget','supportLine'] },
-    { title:'Tracking Target', keys:['birthRate','curveRatio'] }  /* curveRatio は特別行 */
+    { title:'General',
+      keys:['sensNormal','sensAim','playTime','hitBoxSize',
+            'cursorSize','vibration','visualizeHitBox','buttonLayout'] },
+    { title:'Shoot Target',
+      keys:['numTarget','supportLine','lineWidth'] },          /* ★ lineWidth を supportLine の直後に配置 */
+    { title:'Tracking Target',
+      keys:['birthRate','curveRatio'] }                        /* curveRatio は特別行 */
   ];
 
   const form = document.getElementById('form-container');
@@ -112,7 +117,7 @@ window.addEventListener('DOMContentLoaded', () => {
      ユーティリティ関数
      ================================================================= */
 
-  /* 通常行 */
+  /* 通常行 --------------------------------------------------------- */
   function addRow(key){
     const val = SETTINGS[key];
     const row = document.createElement('div'); row.className='form-row';
@@ -134,6 +139,7 @@ window.addEventListener('DOMContentLoaded', () => {
         case 'numTarget': input.min=1;break;
         case 'birthRate': input.min=1;break;
         case 'cursorSize':input.min=1;break;
+        case 'lineWidth': input.min=1;break;       /* ★ 最小値 1 */
       }
     }else if(typeof val==='boolean'){
       input=document.createElement('input'); input.type='checkbox'; input.checked=val;
@@ -152,7 +158,7 @@ window.addEventListener('DOMContentLoaded', () => {
     row.appendChild(input); form.appendChild(row);
   }
 
-  /* curve ratio 行 */
+  /* curve ratio 行 ------------------------------------------------ */
   function addCurveRatioRow(){
     const row=document.createElement('div'); row.className='form-row';
     const lab=document.createElement('label'); lab.textContent='curve ratio'; row.appendChild(lab);
@@ -172,7 +178,7 @@ window.addEventListener('DOMContentLoaded', () => {
     row.appendChild(wrap); form.appendChild(row);
   }
 
-  /* フォーム値 → オブジェクト & バリデーション */
+  /* フォーム値 → オブジェクト & バリデーション -------------------- */
   function collectSettings(){
     const obj={};
     document.querySelectorAll('[data-key]').forEach(inp=>{
@@ -182,7 +188,7 @@ window.addEventListener('DOMContentLoaded', () => {
       else                           obj[k]=inp.value;
     });
 
-    /* ---- バリデーション (同じ内容を Save 時にも使用) ---------- */
+    /* ---- バリデーション ---------------------------------------- */
     const err=[], isInt=n=>Number.isInteger(n);
     if(obj.sensNormal<0) err.push('sensitive(normal) は0以上にしてください');
     if(obj.sensAim<0||obj.sensAim>=obj.sensNormal) err.push('sensitive(aim) は0以上で sensitive(normal) 未満にしてください');
@@ -194,12 +200,13 @@ window.addEventListener('DOMContentLoaded', () => {
       err.push('curve ratio は0～1の範囲で設定してください');
     if(obj.minCurveRatio>obj.maxCurveRatio)
       err.push('curve ratio の最小値は最大値以下にしてください');
+    if(obj.lineWidth<1) err.push('support line width は1以上にしてください');   /* ★ 追加バリデーション */
 
     if(err.length){ alert(err.join('\n')); return null; }
     return obj;
   }
 
-  /* Save 処理 (フォーム → localStorage) */
+  /* Save 処理 (フォーム → localStorage) -------------------------- */
   function saveSettings(){
     const data = collectSettings();
     if(!data) return;

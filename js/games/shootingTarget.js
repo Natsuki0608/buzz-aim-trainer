@@ -173,8 +173,8 @@ function drawLines() {
   this.ctx.clearRect(0, 0, this.aux.width, this.aux.height);
   const ax = this.cx + this.circleSize / 2;
   const ay = this.cy + this.circleSize / 2;
-  this.ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-  this.ctx.lineWidth   = 1;
+  this.ctx.strokeStyle = 'rgb(255,255,255)';
+  this.ctx.lineWidth   = SETTINGS.lineWidth;   /* ★ lineWidth を SETTINGS から取得 */
   this.ctx.beginPath();
   this.targets.forEach(t => {
     const tx = t.x + this.targetSize / 2;
